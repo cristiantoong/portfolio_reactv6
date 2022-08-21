@@ -11,18 +11,18 @@ const Contact = () => {
 
         <ContactMain>
           <ContactLeft>
-            <p>Right Now I am actively seeking for a position as a Web Designer/Front End Developer</p>
+            <p>Right Now I am actively seeking for a position as a Lorem Ipsum Developer</p>
             <p>Feel free to reach me out at</p>
-            <a href="mailto:cristiantoong@gmail.com" class="email-address">email: cristiantoong@gmail.com</a>
+            <a href="mailto:cristiantoong@gmail.com" className="email-address">email: strangerthings@email.com</a>
           </ContactLeft>
           <ContactRight>
             <ContactForm>
-            <form action="POST" class="contact__form-main" method="POST"data-netlify="true" id="form">
-            <label for="name">Your Name</label>
+            <form action="POST" className="contact__form-main" method="POST"data-netlify="true" id="form">
+            <label htmlFor="name">Your Name</label>
             <input type="text" id="name" name="name"/>
-            <label for="email">Your Email</label>
+            <label htmlFor="email">Your Email</label>
             <input type="email" id="email" name="email"/>
-            <label for="message">Your Message</label>
+            <label htmlFor="message">Your Message</label>
             <textarea name="message" id="message" cols="30" rows="10"></textarea>
             <button type="submit">Submit</button>
             </form>

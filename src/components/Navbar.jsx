@@ -33,18 +33,13 @@ function Navbar() {
     }
   }
   
-
   useEffect(() => {
     hideNavbarMobileMenu();
   }, [])
 
-
-
   window.addEventListener('resize', hideNavbarMobileMenu)
   window.addEventListener('scroll', NavColorOnScroll)
-
-
-
+  
   return (
     <>
       <Nav style={{backgroundColor: active?"#0d0d0b":null, opacity:0.8,transition:"background 0.3s ease"}}>

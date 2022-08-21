@@ -1,17 +1,12 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import About from "./components/About";
-import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
-import Projects from "./components/Projects";
 import GlobalStyle from "./globalStyles";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-
 
 //Pages
 import Home from './pages/Home';
 import ProjectPage from "./pages/ProjectPage";
-
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
   

@@ -25,55 +25,7 @@ const GlobalStyle = createGlobalStyle`
     text-decoration: none!important;
   }
 
-  .container {
-    margin: 0 auto;
-    max-width: 1300px;
-
-
-    &--pall {
-        padding: 1rem 4rem;
-    }
-    &--py {
-        padding-top: 2.25rem;
-        padding-bottom: 2.25;
-    }
-    &--px {
-        padding-right: 1.5rem;
-        padding-left: 1.5rem;
-    }
-
-    &--pt {
-        padding-top: 2.25rem;
-    }
-    &--pr {
-        padding-right: 1.5rem;
-    }
-    &--pb {
-        padding-bottom: 2.25rem;
-    }
-    &--pl {
-        padding-top: 1.5rem;
-    }
-}
-
-.flex {
-    display: flex;
-
-    &-jc-sb {
-        justify-content: space-between;
-    }
-    &-jc-c {
-        justify-content: center;
-    }
-    &-ai-c {
-        align-items: center;
-    }
-  }
-
-
-.highlight {
-    border-bottom: 4px solid rgb(132, 0, 255);
-  }
+  
 `;
 
 export const Container = styled.div`

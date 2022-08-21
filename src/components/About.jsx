@@ -5,12 +5,10 @@ import {accordionData} from '../data/accordionData'
 
 function About() {
   const [selected, setSelected] = useState(null);
-
   const refs = useRef(accordionData.map(() => React.createRef()));
 
   const toggleAccordion = (index) => {
     let content = refs.current;
-
     setSelected(index)
   
       if(selected === index){
@@ -22,14 +20,11 @@ function About() {
         content[index].current.nextElementSibling.style.maxHeight = content[index].current.scrollHeight + "px";
         console.log(selected);
       }
-
   }
-
   return (
     <div>
       <AboutSection>
         <AboutContainer>
-
         <Heading>About</Heading>
         <AboutMain>
           <AboutImg>
@@ -39,14 +34,14 @@ function About() {
           <AboutInfo>
             {accordionData.map((item, index) =>{
               return ( 
-                <>
+                <div key={index}>
                   <Accordion onClick={()=>toggleAccordion(index)} ref={refs.current[index]}>
                   {item.title}
                   </Accordion>
                   <AccordionContent>
                    <p>{item.content}</p>
                   </AccordionContent>
-                </>
+                </div>
 
               )
             })}
@@ -170,7 +165,7 @@ const AccordionContent = styled.div`
 
 
 
-  p:last-child {
+  p:l {
     margin-bottom: 30px;
   }
 

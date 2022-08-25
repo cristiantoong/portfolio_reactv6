@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from 'react'
 import ProfilePic from '../images/profilepic1.png';
 import styled from 'styled-components';
 import {accordionData} from '../data/accordionData'
+import { Heading } from '../globalStyles';
 
 function About() {
   const [selected, setSelected] = useState(null);
@@ -79,19 +80,6 @@ const AboutContainer = styled.div`
   }
   @media screen and (max-width: 768px) {
     width: 100%;
-  }
-`;
-
-const Heading = styled.div`
-  margin-bottom: 2rem;
-  font-weight: 400;
-  text-transform: uppercase;
-  &::before {
-    content: "";
-    background: #fff;
-    width: 38px;
-    height: 4px;
-    display: block;
   }
 `;
 

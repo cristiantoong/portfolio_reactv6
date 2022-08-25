@@ -1,10 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import HeroImage from '../images/hero.jpg'
-import { Link } from 'react-router-dom'
-import { heroData } from '../data/heroData'
-import MockupImage from '../images/myrecipe-mockup.png'
-import ProjectImg from '../images/myrecipe.jpg'
+import { Heading } from '../globalStyles';
 import { projectData } from '../data/projectsData'
 
 const Projects = () => {
@@ -69,19 +65,7 @@ const ProjectContainer = styled.div`
   margin: 0 auto;
   padding: 0 4rem;
 `;
-const Heading = styled.div`
-  margin-bottom: 2rem;
-  font-weight: 400;
-  text-transform: uppercase;
 
-  &::before {
-  content: "";
-  background: #fff;
-  width: 38px;
-  height: 4px;
-  display: block;
-}
-`;
 const ProjectCards = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));

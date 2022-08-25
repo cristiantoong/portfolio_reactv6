@@ -37,6 +37,7 @@ export const Heading = styled.div`
   margin-bottom: 2rem;
   font-weight: 400;
   text-transform: uppercase;
+  font-size: 1.5rem;
   &::before {
     content: "";
     background: #fff;

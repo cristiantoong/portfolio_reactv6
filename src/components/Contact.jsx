@@ -109,11 +109,12 @@ const ContactForm = styled.div`
       border: none;
       outline: none;
       padding: 14px;
-      border: 1px solid $white;
-      color: $white;
+      border: 1px solid #fff;
+      color: #fff;
       font-size: 1rem;
       margin-top: 10px;
-      background-color: $black;
+      background-color: #000;
+      border-radius: 2px;
     }
     label {
       width: 100%;
@@ -127,11 +128,12 @@ const ContactForm = styled.div`
       border: none;
       outline: none;
       padding: 14px;
-      border: 1px solid $white;
-      color: $white;
+      border: 1px solid #fff;
+      color: #fff;
       font-size: 1rem;
       margin-top: 10px;
-      background-color: $black;
+      background-color: #000;
+      border-radius: 2px;
     }
     button {
       width: 100%;
@@ -140,13 +142,14 @@ const ContactForm = styled.div`
       outline: none;
       padding: 16px;
       background: #329345;
-      border: 1px solid $white;
-      color: $white;
-      font-size: $font-med;
+      border: none;
+      border-radius: 2px;
+      color: #fff;
+      font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      background-color: $black;
-      font-weight: 300;
+      font-weight: 500;
+      text-transform: uppercase;
     }
   }
 `;

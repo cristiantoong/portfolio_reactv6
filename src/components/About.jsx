@@ -3,10 +3,22 @@ import ProfilePic from '../images/profilepic1.png';
 import styled from 'styled-components';
 import {accordionData} from '../data/accordionData'
 import { Heading } from '../globalStyles';
+import { Link } from 'react-router-dom'
+
+import sanityClient from '../client.js'
+import imageUrlBuilder from "@sanity/image-url";
+
+const builder = imageUrlBuilder(sanityClient);
+
+function urlFor(source) {
+  return builder.image(source);
+}
+
 
 function About() {
   const [selected, setSelected] = useState(null);
   const refs = useRef(accordionData.map(() => React.createRef()));
+  const [aboutData, setAboutData] = useState(null)
 
   const toggleAccordion = (index) => {
     let content = refs.current;
@@ -16,38 +28,76 @@ function About() {
         content[index].current.nextElementSibling.style.maxHeight = null;
         //set selected to null to toggle open close of accordion
         setSelected(null)
-        console.log(selected);
       } else {
         content[index].current.nextElementSibling.style.maxHeight = content[index].current.scrollHeight + "px";
-        console.log(selected);
       }
   }
+
+  useEffect(() => {
+    sanityClient
+      .fetch(`*[_type == "about"]{
+        aboutImg,
+        accordion[]{
+          ...,
+          "pdfURL": pdfFile.asset->url
+        }
+      }`)
+      .then((data) => setAboutData(data))
+      .catch(console.error)
+  }, [])
+  
+
+
   return (
     <div>
       <AboutSection>
         <AboutContainer>
         <Heading>About</Heading>
-        <AboutMain>
-          <AboutImg>
-            <img src={ProfilePic} alt="profile-pic" />
-          </AboutImg>
+        {aboutData && aboutData.map((item, index) =>{
+          return ( 
+            <AboutMain key={index}>
+              <AboutImg>
+                <img src={urlFor(item.aboutImg)} alt="profile-pic" />
+              </AboutImg>
 
-          <AboutInfo>
-            {accordionData.map((item, index) =>{
-              return ( 
+              <AboutInfo>
+              {item.accordion.map((item, index) => {
+                return (
                 <div key={index}>
                   <Accordion onClick={()=>toggleAccordion(index)} ref={refs.current[index]}>
-                  {item.title}
+                  {
+                      item.title ? item.title : ""
+                    
+                    }
+                    {
+                      item.titleLink ? item.titleLink : ""
+                    
+                    }
                   </Accordion>
                   <AccordionContent>
-                   <p>{item.content}</p>
+                  {/* either plain content or content with link */}
+                    {
+                      item.title ? <p>{item.content}</p> : ""
+                    
+                    }
+                    {
+                      
+                      item.titleLink ? <p>{item.text} <a href={item.pdfURL} target="_blank" rel="noreferrer" >{item.urlText}</a> </p> : ""
+                    
+                    }
+                     {/* end----*/}
                   </AccordionContent>
-                </div>
+              </div>
+                )
+              })}
 
-              )
-            })}
-          </AboutInfo>
-        </AboutMain>
+              </AboutInfo>
+          </AboutMain>
+          )
+        })}
+
+
+   
         
         </AboutContainer>
       </AboutSection>
@@ -58,6 +108,7 @@ function About() {
 export default About
 
 const AboutSection = styled.div`
+  padding-top: 5rem;
   margin-bottom: 8rem;
   @media screen and (max-width: 1160px) {
     margin-bottom: 0;
@@ -152,14 +203,10 @@ const AccordionContent = styled.div`
   transition: max-height 0.2s ease-in-out;
 
 
-
-  p:l {
-    margin-bottom: 30px;
-  }
-
   p {
     line-height: 1.6;
     font-weight: 300;
+    margin-bottom: 5rem;
     a{
       font-weight: 700;
     }

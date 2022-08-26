@@ -1,30 +1,87 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import styled from 'styled-components';
 import { Heading } from '../globalStyles';
 
+import sanityClient from '../client.js'
+import imageUrlBuilder from "@sanity/image-url";
+import { useForm, ValidationError } from '@formspree/react';
+
+const builder = imageUrlBuilder(sanityClient);
+
+function urlFor(source) {
+  return builder.image(source);
+}
+
 
 const Contact = () => {
+  const [contactData, setContactData] = useState(null)
+  const [state, handleSubmit] = useForm("mgeqvzgb")
+
+  useEffect(() => {
+    sanityClient
+      .fetch(`*[_type == "contact"]{
+        para1,
+        para2,
+        emailLink,
+        email,
+      }`)
+      .then((data) => setContactData(data))
+      .catch(console.error)
+  }, [])
+
+  if (state.succeeded) {
+    return <p>The form was submitted successfully.</p>;
+  }
+
   return (
     <>
       <ContactContainer>
         <Heading>Contact</Heading>
 
         <ContactMain>
-          <ContactLeft>
-            <p>Right Now I am actively seeking for a position as a Lorem Ipsum Developer</p>
-            <p>Feel free to reach me out at</p>
-            <a href="mailto:cristiantoong@gmail.com" className="email-address">email: strangerthings@email.com</a>
+
+        {contactData && contactData.map((item,index) => {
+          return (
+            <ContactLeft key={index}>
+            <p>{item.para1}</p>
+            <p>{item.para2}</p>
+            <a href={`mailto:${item.emailLink}`} className="email-address">email: {item.email}</a>
           </ContactLeft>
+          )
+    
+        })}
+ 
           <ContactRight>
             <ContactForm>
-            <form action="POST" className="contact__form-main" method="POST"data-netlify="true" id="form">
+            {/* <form action="https://formspree.io/f/mgeqvzgb" className="contact__form-main" method="POST" data-netlify="true" id="form">
             <label htmlFor="name">Your Name</label>
             <input type="text" id="name" name="name"/>
             <label htmlFor="email">Your Email</label>
             <input type="email" id="email" name="email"/>
             <label htmlFor="message">Your Message</label>
             <textarea name="message" id="message" cols="30" rows="10"></textarea>
-            <button type="submit">Submit</button>
+            <button type="submit" value="Send">Submit</button>
+            </form> */}
+
+            <form onSubmit={handleSubmit} className="contact__form-main" id="form">
+
+            <label htmlFor="email">Your Email</label>
+            <input type="email" id="email" name="email"/>
+            <ValidationError 
+              prefix="Email" 
+              field="email"
+              errors={state.errors}
+            />
+            <label htmlFor="message">Your Message</label>
+            <textarea name="message" id="message" cols="30" rows="10"></textarea>
+            <ValidationError 
+              prefix="Message" 
+              field="message"
+              errors={state.errors}
+            />
+
+            <button type="submit" disabled={state.submitting}>Submit</button>
+
             </form>
             </ContactForm>
           </ContactRight>
@@ -40,11 +97,9 @@ export default Contact
 
 //container
 const ContactContainer= styled.div`
-  padding: 0 50px;
-  padding: 0 50px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 4rem;
+  padding: 5rem 4rem;
   max-width: 1600px;
 
 `;
@@ -85,9 +140,9 @@ const ContactLeft = styled.div`
   }
 `;
 
-const ContactEmailAddress = styled.div`
-  font-weight: 400;
-`;
+// const ContactEmailAddress = styled.div`
+//   font-weight: 400;
+// `;
 
 
 const ContactRight = styled.div`
@@ -113,7 +168,7 @@ const ContactForm = styled.div`
       color: #fff;
       font-size: 1rem;
       margin-top: 10px;
-      background-color: #000;
+      background-color: #0D0D0B;
       border-radius: 2px;
     }
     label {
@@ -132,7 +187,7 @@ const ContactForm = styled.div`
       color: #fff;
       font-size: 1rem;
       margin-top: 10px;
-      background-color: #000;
+      background-color: #0D0D0B;
       border-radius: 2px;
     }
     button {

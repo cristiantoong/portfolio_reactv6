@@ -1,48 +1,74 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import HeroImage from '../images/hero.jpg'
 import { Link } from 'react-router-dom'
-import { heroData } from '../data/heroData'
+
+import sanityClient from '../client.js'
+import imageUrlBuilder from "@sanity/image-url";
+
+const builder = imageUrlBuilder(sanityClient);
+
+function urlFor(source) {
+  return builder.image(source);
+}
 
 
 function Hero() {
+  const [heroData, setHeroData] = useState(null)
+
+  useEffect(() => {
+    sanityClient
+      .fetch(`*[_type == "hero"]{
+        heroImg,
+        primary,
+        secondary,
+        tertiary,
+        ctaBtnLink,
+        ctaBtn,
+        heroSocials[]{
+          ...
+        }
+      }`)
+      .then((data) => setHeroData(data))
+      .catch(console.error)
+  }, [])
+  
   return (
-    <div>
-      <HeroSection>
-        <HeroContainer>
-        
-        {heroData.map((item,index) => {
-          return (
-            <div key={index}>
-            <HeroMain >
-            <h1>
-              {item.primary}
-            </h1>
-            <h3>{item.secondary}</h3>
-            <p>
-              {item.tertiary}
-            </p>
-            <Link to={item.ctaBtnLink}>{item.ctaBtn}</Link>
-            </HeroMain>
-            <HeroSocials>
-              {item.heroSocials.map((item, index)=> {
-                return (
-                  <HeroSocial key={index}>
-                  <a href={item.href} target="_blank" rel="noopener noreferrer" key={index}>
-                    <img src={item.src} alt="social" />
-                  </a>
-                  </HeroSocial>
+    <>
+      {heroData && heroData.map((item,index) => {
+        return (
+          <HeroSection key={index}>
+            <img src={urlFor(item.heroImg)} alt="hero" className='hero-img'/>
+            <HeroContainer>
+              <HeroMain >
+              <h1>
+                {item.primary}
+              </h1>
+              <h3>{item.secondary}</h3>
+              <p>
+                {item.tertiary}
+              </p>
+              <Link to={item.ctaBtnLink}>{item.ctaBtn}</Link>
+              </HeroMain>
+              <HeroSocials>
+                {item.heroSocials.map((item, index)=> {
+                  return (
+                    <HeroSocial key={index}>
+                    <a href={item.urlField} target="_blank" rel="noopener noreferrer" key={index}>
+                      <img src={urlFor(item.socialImage)} alt="social" />
+                    </a>
+                    </HeroSocial>
+                  )
+                })}
 
-                )
-              })}
+              </HeroSocials>
+            </HeroContainer>
+        </HeroSection>
+        )
 
-            </HeroSocials>
-            </div>
-          )
-        })}
-        </HeroContainer>
-      </HeroSection>
-    </div>
+
+      })}
+    </>
   )
 }
 
@@ -50,15 +76,16 @@ export default Hero
 
 const HeroSection = styled.section`
   min-height: 100vh;
-  background: url(${HeroImage}) center/cover no-repeat;
+  /* background: url(${HeroImage}) center/cover no-repeat; */
 
   display: flex;
   align-items: center;
   width: 100%;
   position: relative;
 
-  //overlay transparent bg
-  &::before {
+
+  
+  &::after {
     content: "";
     position: absolute;
     background: black;
@@ -68,13 +95,28 @@ const HeroSection = styled.section`
     bottom: 0;
     left: 0;
   }
+
+  .hero-img {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+
 `;
 const HeroContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   padding: 0 8rem;
   max-width: 1600px;
+  z-index: 20;
 `;
+
 const HeroMain = styled.div`
   position: relative;
   width: 60%;
@@ -85,17 +127,20 @@ const HeroMain = styled.div`
     margin-bottom: 20px;
     font-family: "Playfair Display", serif;
     font-weight: normal;
+    text-transform: capitalize;
   }
   h3 {
     font-size: 2rem; //48px
     font-weight: 400;
     margin-bottom: 2rem;
+    text-transform: capitalize;
   }
   p{
     font-size: 1.2rem;
     font-weight: 300;
     line-height: 1.6;
     margin-bottom: 3rem;
+    text-transform: capitalize;
   }
   a {
     font-family: "Playfair Display", serif;

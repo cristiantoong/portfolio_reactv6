@@ -33,11 +33,10 @@ export const Container = styled.div`
   max-width: 1300px;
 `
 
-export const Heading = styled.div`
+export const Heading = styled.h1`
   margin-bottom: 2rem;
   font-weight: 400;
   text-transform: uppercase;
-  font-size: 1.5rem;
   &::before {
     content: "";
     background: #fff;

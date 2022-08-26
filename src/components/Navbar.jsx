@@ -1,70 +1,126 @@
-import React, {useState, useEffect} from 'react'
-import { Link } from 'react-router-dom'
-import styled from 'styled-components'
-import LogoImage from '../images/ct-logo-full-white.svg'
-import { menuData } from '../data/menuData'
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+// import { Link as LinkScroll } from "react-scroll";
+import styled from "styled-components";
+import { menuData } from "../data/menuData";
+
+import sanityClient from "../client.js";
+import imageUrlBuilder from "@sanity/image-url";
+
+const builder = imageUrlBuilder(sanityClient);
+
+function urlFor(source) {
+  return builder.image(source);
+}
 
 function Navbar() {
   const [click, setClick] = useState(false);
   const [active, setActive] = useState(false);
+  const [menuActive, setMenuActive] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [navbarData, setNavbarData] = useState(null);
+  const childRef = useRef();
 
   const handleClick = () => {
     setClick(!click); //toggle
   };
 
   const closeMobileMenu = () => {
-    setClick(false)
-  }
+    setClick(false);
+  };
 
   const hideNavbarMobileMenu = () => {
     var newWidth = window.innerWidth;
-    if (newWidth >= "700"){
+    if (newWidth >= "700") {
       setClick(false);
     }
-  }
+  };
 
   const NavColorOnScroll = () => {
     let scrollPos = window.scrollY;
-    if (scrollPos >= 100){
-        setActive(true);
-    }
-    else {
+    console.log(scrollPos);
+    if (scrollPos >= 100) {
+      setActive(true);
+    } else {
       setActive(false);
     }
-  }
-  
-  useEffect(() => {
-    hideNavbarMobileMenu();
-  }, [])
+  };
 
-  window.addEventListener('resize', hideNavbarMobileMenu)
-  window.addEventListener('scroll', NavColorOnScroll)
-  
+  // const activeMenu = (index) => {
+  //   setSelected(index)
+
+  //   if(selected === index){
+  //     setMenuActive(true);
+  //     setSelected(null)
+  //     console.log(selected, menuActive);
+  //   } else {
+  //     setMenuActive(false)
+  //   }
+
+  // }
+
+  window.addEventListener("resize", hideNavbarMobileMenu);
+  window.addEventListener("scroll", NavColorOnScroll);
+
+  useEffect(() => {
+    sanityClient
+      .fetch(
+        `*[_type == "navbar"]{
+        logo,
+        menus[]{
+          ...
+        }
+      }`
+      )
+      .then((data) => setNavbarData(data))
+      .catch(console.error);
+  }, []);
+
   return (
     <>
-      <Nav style={{backgroundColor: active?"#0d0d0b":null, opacity:0.8,transition:"background 0.3s ease"}}>
-        <NavbarContainer>
-          <NavLogo to="/">
-            <img src={LogoImage} alt="logo" />
-          </NavLogo>
-          <NavMenu>
-            
-      
-          {menuData.map((item, index) => {
-              const border = index === menuData.length-1 ? '1px solid #fff':'none';
-              const padding = index === menuData.length-1 ? '0 24px':'0';
-        
-              return (
-                <NavItem key={index}>
-                  <NavLinks to={item.link} style={{border, padding}}>
-                    {item.title}
-                  </NavLinks>
-                </NavItem>
-              )
-            })}
+      <Nav
+        style={{
+          backgroundColor: active ? "#0d0d0b" : null,
+          opacity: 0.8,
+          transition: "background 0.3s ease",
+        }}
+      >
+        {navbarData &&
+          navbarData.map((item, index) => {
+            const border =
+              index === menuData.length - 1 ? "1px solid #fff" : "none";
+            const padding = index === menuData.length - 1 ? "0 24px" : "0";
 
-          </NavMenu>
-        </NavbarContainer>
+            return (
+              <NavbarContainer key={index}>
+                <NavLogo to="/">
+                  <img src={urlFor(item.logo)} alt="logo" />
+                </NavLogo>
+                <NavMenu>
+                  {item.menus.map((item, index) => {
+                    return (
+                      <NavItem
+                        key={index}
+                        menuActive={menuActive}
+                        style={{
+                          border:
+                            selectedId === index ? "1px solid #fff" : "none",
+                        }}
+                      >
+                        <NavLinks
+                          to={item.url}
+                          style={{ border, padding }}
+                          onClick={() => setSelectedId(index)}
+                        >
+                          {item.title}
+                        </NavLinks>
+                      </NavItem>
+                    );
+                  })}
+                </NavMenu>
+              </NavbarContainer>
+            );
+          })}
       </Nav>
       <MobileButton onClick={handleClick} click={click}>
         <span></span>
@@ -73,23 +129,25 @@ function Navbar() {
       <NavbarMobile click={click}>
         <MobileMenu>
           <Menus>
-          {menuData.map((item, index) => {
+            {menuData.map((item, index) => {
               return (
-                <MobileLinks to={item.link} onClick={closeMobileMenu} key={index}>
+                <MobileLinks
+                  to={item.link}
+                  onClick={closeMobileMenu}
+                  key={index}
+                >
                   {item.title}
                 </MobileLinks>
-              )
+              );
             })}
-
           </Menus>
         </MobileMenu>
       </NavbarMobile>
     </>
-  )
+  );
 }
 
-export default Navbar
-
+export default Navbar;
 
 const Nav = styled.div`
   height: 80px;
@@ -102,28 +160,27 @@ const Nav = styled.div`
   transition: all 0.3s ease;
 `;
 const NavbarContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 
-    height: 80px;
-    z-index: 1;
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 0 4rem;
-    
+  height: 80px;
+  z-index: 80;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 4rem;
 `;
 
 const NavLogo = styled(Link)`
   width: 42px;
-    height: 42px;
-    align-self: center;
-    font-size: 2rem;
+  height: 42px;
+  align-self: center;
+  font-size: 2rem;
 
-    img {
-      width: 100%;
-      height: 100%;
-    }
+  img {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const NavMenu = styled.ul`
@@ -139,8 +196,9 @@ const NavMenu = styled.ul`
 const NavItem = styled.li`
   height: 40px;
   cursor: pointer;
-  
- 
+  text-transform: capitalize;
+  border: ${({ active }) => (active ? "1px solid #fff" : "")};
+  padding: 0 3rem;
 `;
 
 const NavLinks = styled(Link)`
@@ -148,29 +206,33 @@ const NavLinks = styled(Link)`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 5rem;
+  /* margin-left: 5rem; */
   text-decoration: none;
   height: 100%;
   transition: all 0.3s ease;
   font-size: 1rem;
 
   &:hover {
-      color: #ccc;
-    }
+    color: #ccc;
+  }
+
+  /* &.active {
+    border-bottom: 1px solid #fff;
+  } */
 `;
 
 const NavbarMobile = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${({click}) => (click ? 'rgba(0,0,0,0.9)': '#0d0d0b')};
+  background: ${({ click }) => (click ? "rgba(0,0,0,0.9)" : "#0d0d0b")};
   overflow: hidden;
-  width: ${({click}) => (click ? '100%':0 )};
+  width: ${({ click }) => (click ? "100%" : 0)};
   position: fixed;
-  height: ${({click}) => (click ? '100%':0)};
-  opacity: ${({click}) => (click ? 1: 0)};
+  height: ${({ click }) => (click ? "100%" : 0)};
+  opacity: ${({ click }) => (click ? 1 : 0)};
   transition: opacity 1s ease-in-out;
-  z-index: ${({click}) => (click ? 99: 'auto')};
+  z-index: ${({ click }) => (click ? 99 : "auto")};
 `;
 
 const MobileButton = styled.div`
@@ -206,8 +268,8 @@ const MobileMenu = styled.div`
   align-items: center;
 `;
 const Menus = styled.div`
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 `;
 const MobileLinks = styled(Link)`
   font-size: 2rem;

@@ -1,58 +1,92 @@
-import React from 'react'
-import styled from 'styled-components'
-import { Heading } from '../globalStyles';
-import { projectData } from '../data/projectsData'
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { Heading } from "../globalStyles";
+
+import sanityClient from "../client.js";
+import imageUrlBuilder from "@sanity/image-url";
+
+const builder = imageUrlBuilder(sanityClient);
+
+function urlFor(source) {
+  return builder.image(source);
+}
 
 const Projects = () => {
+  const [projectsData, setProjectsData] = useState(null);
+
+  useEffect(() => {
+    sanityClient
+      .fetch(
+        `*[_type == "projects"]{
+        cardImg,
+        overlayMockImg,
+        overlayInfoTitle,
+        skillset[]{
+          ...,
+        },
+        buttons[]{
+          ...
+        }
+      }`
+      )
+      .then((data) => setProjectsData(data))
+      .catch(console.error);
+  }, []);
+
   return (
     <div>
       <ProjectsSection>
         <ProjectContainer>
           <Heading>Projects</Heading>
 
-        <ProjectCards>
-          {projectData.map((item, index) => {
-            return (
-              <ProjectCard key={item.id}>
-              <img src={item.cardImg} alt="project-img" />
-              <Overlay>
-                <InnerOverlay>
-                  <OverlayMockupImg>
-                    <img src={item.overlayMockImg} alt={item.overlayInfoTitle} />
-                  </OverlayMockupImg>
-                  <OverlayInfo>
-                  <h2>{item.overlayInfoTitle}</h2>
-                  <SkillSet>
-                      <h4>Skillset:</h4>
-                      {item.skillSet.map((item, index) =>{
-                        return (
-                          <p key={index}>{item}</p>
-                        )
-                      })}
-                  </SkillSet>
-                  {item.buttons.map((item, index) => {
-                    return (
-                      <a key={index} href={item.src} target="_blank" rel="noopener noreferrer">
-                      {item.label}
-                      </a>
-                    )
-                  })}
-                  
-                  </OverlayInfo>
-                </InnerOverlay>
-              </Overlay>
-              </ProjectCard>
-            )
-          })}
-        </ProjectCards>
-
+          <ProjectCards>
+            {projectsData &&
+              projectsData.map((item, index) => {
+                return (
+                  <ProjectCard key={index}>
+                    <img src={urlFor(item.cardImg)} alt="project-img" />
+                    <Overlay>
+                      <InnerOverlay>
+                        <OverlayMockupImg>
+                          <img
+                            src={urlFor(item.overlayMockImg)}
+                            alt={item.overlayInfoTitle}
+                          />
+                        </OverlayMockupImg>
+                        <OverlayInfo>
+                          <h2>{item.overlayInfoTitle}</h2>
+                          <SkillSet>
+                            <h4>Skillset:</h4>
+                            {item.skillset.map((item, index) => {
+                              return <p key={index}>{item.skill}</p>;
+                            })}
+                          </SkillSet>
+                          {item.buttons.map((item, index) => {
+                            return (
+                              <a
+                                key={index}
+                                href={item.btnLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {item.btnLabel}
+                              </a>
+                            );
+                          })}
+                        </OverlayInfo>
+                      </InnerOverlay>
+                    </Overlay>
+                  </ProjectCard>
+                );
+              })}
+          </ProjectCards>
         </ProjectContainer>
       </ProjectsSection>
     </div>
-  )
-}
+  );
+};
 
-export default Projects
+export default Projects;
 
 const ProjectsSection = styled.div`
   min-height: 100vh;
@@ -97,12 +131,9 @@ const ProjectCard = styled.div`
   }
 
   &:hover ${Overlay} {
-      opacity: 1;
-    }
-
+    opacity: 1;
+  }
 `;
-
-
 
 const InnerOverlay = styled.div`
   display: flex;
@@ -127,8 +158,6 @@ const OverlayInfo = styled.div`
     padding: 1rem 2rem;
     margin-right: 1rem;
   }
-
-
 `;
 
 const SkillSet = styled.div`
@@ -141,5 +170,3 @@ const SkillSet = styled.div`
     font-size: 1rem;
   }
 `;
-
-

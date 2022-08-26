@@ -1,38 +1,58 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import styled from 'styled-components';
 import { Link } from 'react-router-dom'
-import Logo from '../images/ct-logo-full-white.svg'
-import { heroData } from '../data/heroData'
+
+import sanityClient from '../client.js'
+import imageUrlBuilder from "@sanity/image-url";
+
+const builder = imageUrlBuilder(sanityClient);
+
+function urlFor(source) {
+  return builder.image(source);
+}
 
 const Footer = () => {
+  const [footerData, setFooterData] = useState(null)
+
+  useEffect(() => {
+    sanityClient
+      .fetch(`*[_type == "footer"]{
+        logo,
+        footerSocials[]{
+          ...
+        }
+      }`)
+      .then((data) => setFooterData(data))
+      .catch(console.error)
+  }, [])
   return (
     <FooterContainer>
-      <FooterMain>
-        <FooterLogo>
-          <Link to="/">
-              <img src={Logo} alt="logo"/>
-          </Link>
-        </FooterLogo>
-        <FooterCopyright>
-        © <span id="current-year">{new Date().getFullYear()}</span>, Cristian To-ong
-        </FooterCopyright>
-      
-          {heroData.map((item,i) => {
+       {footerData && footerData.map((item,index) => {
+        return (
+        <FooterMain key={index}>
+          <FooterLogo>
+            <Link to="/">
+                <img src={urlFor(item.logo)} alt="logo"/>
+            </Link>
+          </FooterLogo>
+          <FooterCopyright>
+          © <span id="current-year">{new Date().getFullYear()}</span>, Cristian To-ong
+          </FooterCopyright>
+        
+          <FooterSocials>
+            {item.footerSocials.map((item,index)=> {
             return (
-              <FooterSocials key={i}>
-                {item.heroSocials.map((item,i)=> {
-                return (
-                  <a href={item.href} key={i} target="_blank" rel="noopener noreferrer">
-                    <img src={item.src} alt="social"/>
-                  </a>
-                )
-              })}
-              </FooterSocials> 
+              <a href={item.urlField} key={index} target="_blank" rel="noopener noreferrer">
+                <img src={urlFor(item.socialImage)} alt="social"/>
+              </a>
             )
           })}
-      
+          </FooterSocials> 
+            
 
-      </FooterMain>
+        </FooterMain>
+      )
+    })}
     </FooterContainer>
   )
 }
